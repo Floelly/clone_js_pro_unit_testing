@@ -72,13 +72,53 @@ describe('sortList', () => {
  */
 
 describe('formatCurrency', () => {
-  it('does <insert your test here>', () => {
-    return true;
+  it('does return "$0.00" if NaN given', () => {
+    expect(formatCurrency(NaN)).toEqual("$0.00");
+  });
+  it('does return "$5.01" if 5.00991 given', () => {
+    expect(formatCurrency(5.00991)).toEqual("$5.01");
   });
 });
 
 describe('handlePromises', () => {
-  it('does <insert your test here>', () => {
-    return true;
+  it('does resolve on just resolving promises', () => {
+    const tasks = [
+      () => new Promise((res,rej) => res()),
+      () => new Promise((res,rej) => setTimeout(() => res(), 1000)),
+      () => new Promise((res,rej) => res()),
+    ]
+    expect(handlePromises(tasks)).toEqual(Promise.resolve(""));
+  });
+  it('throws error on just one rejecting promise', async () => {
+    const tasks = [
+      () => new Promise((res,rej) => res()),
+      () => new Promise((res,rej) => setTimeout(() => rej(), 1000)),
+      () => new Promise((res,rej) => setTimeout(() => rej(), 100000)),
+    ]
+    try {
+      await handlePromises(tasks);
+      expect(false).toEqual(true);
+    } catch (e) {
+      expect(true).toEqual(true);
+    }
+  });
+
+  it('throws error on attribute null', async () => {
+    const tasks = null
+    try {
+      await handlePromises(null);
+      expect(false).toEqual(true);
+    } catch (e) {
+      expect(true).toEqual(true);
+    }
+  });
+  
+  it('throws error on no attribute', async () => {
+    try {
+      await handlePromises();
+      expect(false).toEqual(true);
+    } catch (e) {
+      expect(true).toEqual(true);
+    }
   });
 });
